@@ -1,0 +1,145 @@
+{
+  "sources": [
+    "ai4i2020.csv",
+    "PdM_errors.csv",
+    "PdM_failures.csv",
+    "PdM_machines.csv",
+    "PdM_maint.csv",
+    "PdM_telemetry.csv"
+  ],
+  "total_equipment": 100,
+  "critical_equipment": 49,
+  "avg_failure_probability": 0.0012,
+  "avg_rul": 98.51,
+  "temperature": 26.85,
+  "vibration": 40.39,
+  "pressure": 100.86,
+  "health_score": 91,
+  "metrics": {
+    "sources": [
+      "ai4i2020.csv",
+      "PdM_errors.csv",
+      "PdM_failures.csv",
+      "PdM_machines.csv",
+      "PdM_maint.csv",
+      "PdM_telemetry.csv"
+    ],
+    "rows": 886142,
+    "training_rows": 40737,
+    "columns": 87,
+    "target_column": "failure_binary",
+    "time_column": "datetime",
+    "equipment_column": "machineid",
+    "processed_path": "data\\processed\\maintenance_features.csv",
+    "classification": {
+      "best_model": "lightgbm",
+      "metrics": {
+        "logistic_regression": {
+          "accuracy": 0.9579614081602592,
+          "precision": 0.25807120500782477,
+          "recall": 0.718273489774762,
+          "f1": 0.3687476159542569,
+          "roc_auc": 0.8776503731919796,
+          "confusion_matrix": [
+            [
+              6030,
+              497
+            ],
+            [
+              120,
+              142
+            ]
+          ]
+        },
+        "random_forest": {
+          "accuracy": 0.9690970687877449,
+          "precision": 0.4907512626262626,
+          "recall": 0.589001979078315,
+          "f1": 0.41184849184468925,
+          "roc_auc": 0.8948399230223163,
+          "confusion_matrix": [
+            [
+              6526,
+              1
+            ],
+            [
+              257,
+              5
+            ]
+          ]
+        },
+        "svm": {
+          "accuracy": 0.8782442185888938,
+          "precision": 0.18413476263399695,
+          "recall": 0.8,
+          "f1": 0.278906623207526,
+          "roc_auc": 0.8516278800765905,
+          "confusion_matrix": [
+            [
+              6527,
+              0
+            ],
+            [
+              262,
+              0
+            ]
+          ]
+        },
+        "xgboost": {
+          "accuracy": 0.9670938282515834,
+          "precision": 0.33676624356892504,
+          "recall": 0.6991895203091132,
+          "f1": 0.43414500794724403,
+          "roc_auc": 0.8198566963507197,
+          "confusion_matrix": [
+            [
+              6352,
+              175
+            ],
+            [
+              145,
+              117
+            ]
+          ]
+        },
+        "lightgbm": {
+          "accuracy": 0.9705405803505671,
+          "precision": 0.4234767891682785,
+          "recall": 0.6402412590707757,
+          "f1": 0.46597535469119605,
+          "roc_auc": 0.8598260414959252,
+          "confusion_matrix": [
+            [
+              6484,
+              43
+            ],
+            [
+              164,
+              98
+            ]
+          ]
+        }
+      }
+    },
+    "rul": {
+      "best_model": "gradient_boosting",
+      "metrics": {
+        "random_forest_regressor": {
+          "mae": 83.98872514361467,
+          "rmse": 100.09849507417218,
+          "r2": -0.7630591996780904
+        },
+        "gradient_boosting": {
+          "mae": 73.03237620868269,
+          "rmse": 84.13250713965337,
+          "r2": -0.21610506318924294
+        },
+        "xgboost_regressor": {
+          "mae": 74.12730707884151,
+          "rmse": 85.86069997807355,
+          "r2": -0.2704225609978519
+        }
+      }
+    }
+  }
+}

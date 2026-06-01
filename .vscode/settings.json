@@ -1,0 +1,14 @@
+{
+  "python.defaultInterpreterPath": "C:\\Python313\\python.exe",
+  "python.terminal.activateEnvironment": false,
+  "python.analysis.extraPaths": [
+    "${workspaceFolder}"
+  ],
+  "jupyter.notebookFileRoot": "${workspaceFolder}",
+  "jupyter.askForKernelRestart": false,
+  "notebook.output.textLineLimit": 200,
+  "jupyter.kernels.excludePythonEnvironments": [
+    "C:\\Python313\\python.exe"
+  ],
+  "python-envs.defaultEnvManager": "ms-python.python:system"
+}

@@ -1,0 +1,35 @@
+# ── Jupyter ───────────────────────────────────────────────────────────────────
+jupyter
+ipykernel
+nbformat
+nbconvert
+nbclient
+ipython
+tabulate
+
+# ── Visualisation ─────────────────────────────────────────────────────────────
+matplotlib
+seaborn
+plotly
+
+# ── Machine Learning ──────────────────────────────────────────────────────────
+scikit-learn
+xgboost
+lightgbm
+shap
+
+# ── Data ──────────────────────────────────────────────────────────────────────
+pandas
+numpy
+joblib
+
+# ── Backend FastAPI (manquaient dans ton fichier) ─────────────────────────────
+fastapi
+uvicorn[standard]
+pydantic
+pydantic-settings
+python-multipart
+
+# ── Utilitaires ───────────────────────────────────────────────────────────────
+pathlib2
+python-dotenv
