@@ -30,6 +30,7 @@ class TrainingResult:
     best_name: str
     best_pipeline: Pipeline
     metrics: dict[str, dict]
+    prediction_horizon: str
 
 
 def candidate_models(y: pd.Series | None = None) -> dict:
@@ -92,8 +93,16 @@ def train_classifiers(x: pd.DataFrame, y: pd.Series) -> TrainingResult:
             best_pipeline = Pipeline([("preprocess", build_preprocessor(x)), ("model", clone(model))]).fit(x, y)
 
     assert best_pipeline is not None
-    return TrainingResult(best_name, best_pipeline, metrics)
+    return TrainingResult(best_name, best_pipeline, metrics, prediction_horizon="24h")
 
 
 def save_classifier(result: TrainingResult, path) -> None:
-    joblib.dump({"name": result.best_name, "pipeline": result.best_pipeline, "metrics": result.metrics}, path)
+    joblib.dump(
+        {
+            "name": result.best_name,
+            "pipeline": result.best_pipeline,
+            "metrics": result.metrics,
+            "prediction_horizon": result.prediction_horizon,
+        },
+        path,
+    )

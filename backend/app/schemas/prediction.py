@@ -13,6 +13,7 @@ class FailurePrediction(BaseModel):
     equipment_id: str
     failure_probability: float
     predicted_failure: bool
+    prediction_horizon: str = "24h"
     risk_level: str
     top_factors: list[dict[str, float | str]]
 

@@ -15,6 +15,8 @@ class Settings(BaseSettings):
     api_host: str = "0.0.0.0"
     api_port: int = 8000
     frontend_url: str = "http://localhost:3000"
+    # Production CORS origins (for Render + Vercel)
+    allowed_origins: str = "http://localhost:3000,http://127.0.0.1:3000,http://localhost:5173,http://127.0.0.1:5173"
     data_raw_dir: Path = Path("data/raw")
     data_processed_dir: Path = Path("data/processed")
     model_dir: Path = Path("backend/saved_models")

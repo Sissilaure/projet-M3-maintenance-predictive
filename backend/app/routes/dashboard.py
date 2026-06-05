@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request
 from backend.app.core.limiter import limiter
 
-from backend.app.services.dashboard_service import dashboard_stats
+from backend.app.services.dashboard_service import dashboard_stats, timeseries_data
 from backend.app.services.training_service import load_metrics
 
 router = APIRouter(tags=["dashboard"])
@@ -11,6 +11,13 @@ router = APIRouter(tags=["dashboard"])
 @limiter.limit("30/minute")
 def stats(request: Request):
     return dashboard_stats()
+
+
+@router.get("/dashboard/timeseries")
+@limiter.limit("30/minute")
+def timeseries(request: Request, limit: int = 100):
+    """Retourne les séries temporelles réelles des capteurs."""
+    return {"data": timeseries_data(limit=min(limit, 500))}
 
 
 @router.get("/metrics")

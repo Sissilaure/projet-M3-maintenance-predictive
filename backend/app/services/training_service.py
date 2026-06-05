@@ -6,7 +6,12 @@ import pandas as pd
 from backend.app.config.settings import get_settings
 from backend.app.ml.classification import save_classifier, train_classifiers
 from backend.app.ml.feature_engineering import add_temporal_features, add_time_features, calculate_rul
-from backend.app.ml.preprocessing import clean_dataframe, load_raw_datasets, split_features_target
+from backend.app.ml.preprocessing import (
+    clean_dataframe,
+    derive_predictive_failure_target,
+    load_raw_datasets,
+    split_features_target,
+)
 from backend.app.ml.rul_model import save_rul_model, train_rul_models
 
 
@@ -19,6 +24,12 @@ def train_all() -> dict:
     df = clean_dataframe(bundle.frame)
     df = add_time_features(df, bundle.time_column)
     df = add_temporal_features(df, bundle.equipment_column, bundle.time_column)
+    df, predictive_target = derive_predictive_failure_target(
+        df,
+        bundle.target_column,
+        bundle.equipment_column,
+        bundle.time_column,
+    )
     processed_path = settings.data_processed_dir / "maintenance_features.csv"
     df.to_csv(processed_path, index=False)
     train_df = select_training_rows(df, settings.training_max_rows, bundle.time_column)
@@ -29,16 +40,21 @@ def train_all() -> dict:
         "training_rows": int(len(train_df)),
         "columns": int(len(df.columns)),
         "target_column": bundle.target_column,
+        "prediction_target": predictive_target,
         "time_column": bundle.time_column,
         "equipment_column": bundle.equipment_column,
         "processed_path": str(processed_path),
     }
 
-    if bundle.target_column:
-        x, y = split_features_target(train_df, bundle.target_column)
+    if predictive_target:
+        x, y = split_features_target(train_df, predictive_target)
         classifier = train_classifiers(x, y)
         save_classifier(classifier, settings.model_dir / "classifier.joblib")
-        response["classification"] = {"best_model": classifier.best_name, "metrics": classifier.metrics}
+        response["classification"] = {
+            "best_model": classifier.best_name,
+            "prediction_horizon": classifier.prediction_horizon,
+            "metrics": classifier.metrics,
+        }
 
         rul = calculate_rul(train_df, bundle.target_column, bundle.equipment_column, bundle.time_column)
         x_rul = x.copy()

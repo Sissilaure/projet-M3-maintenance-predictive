@@ -9,7 +9,6 @@ const Rul = lazy(() => import("./pages/Rul").then((module) => ({ default: module
 const Analytics = lazy(() => import("./pages/Analytics").then((module) => ({ default: module.Analytics })));
 const Explainability = lazy(() => import("./pages/Explainability").then((module) => ({ default: module.Explainability })));
 const History = lazy(() => import("./pages/History").then((module) => ({ default: module.History })));
-const Settings = lazy(() => import("./pages/Settings").then((module) => ({ default: module.Settings })));
 
 const pages = {
   dashboard: Dashboard,
@@ -18,8 +17,7 @@ const pages = {
   rul: Rul,
   analytics: Analytics,
   explainability: Explainability,
-  historique: History,
-  settings: Settings
+  historique: History
 };
 
 function PageLoader() {

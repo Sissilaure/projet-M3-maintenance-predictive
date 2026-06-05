@@ -10,6 +10,16 @@ export async function getStats() {
   return data;
 }
 
+export async function getTimeseries(limit = 100) {
+  try {
+    const { data } = await api.get("/dashboard/timeseries", { params: { limit } });
+    return data.data || [];
+  } catch (error) {
+    console.warn("Timeseries data unavailable, using demo data");
+    return null;
+  }
+}
+
 export async function getAlerts() {
   const { data } = await api.get("/alerts");
   return data;
@@ -17,6 +27,11 @@ export async function getAlerts() {
 
 export async function trainModels() {
   const { data } = await api.post("/train");
+  return data;
+}
+
+export async function getTrainingStatus() {
+  const { data } = await api.get("/train/status");
   return data;
 }
 

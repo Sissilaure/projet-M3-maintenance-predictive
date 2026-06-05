@@ -182,6 +182,53 @@ def infer_failure_target(df: pd.DataFrame) -> str | None:
     return col
 
 
+def derive_predictive_failure_target(
+    df: pd.DataFrame,
+    target_col: str | None,
+    equipment_col: str | None,
+    time_col: str | None,
+    horizon_hours: int = 24,
+    horizon_steps: int = 3,
+) -> tuple[pd.DataFrame, str | None]:
+    if target_col is None or target_col not in df.columns:
+        return df, target_col
+
+    out = df.copy()
+    if time_col and time_col in out.columns and pd.api.types.is_datetime64_any_dtype(out[time_col]):
+        label = f"failure_in_next_{horizon_hours}h"
+    else:
+        label = f"failure_in_next_{horizon_steps}_steps"
+
+    if label in out.columns:
+        return out, label
+
+    out[label] = 0
+    sort_cols = [c for c in [equipment_col, time_col] if c and c in out.columns]
+    if sort_cols:
+        out = out.sort_values(sort_cols)
+
+    failure = pd.to_numeric(out[target_col], errors="coerce").fillna(0).astype(int)
+    groups = out.groupby(equipment_col, dropna=False) if equipment_col and equipment_col in out.columns else [(None, out)]
+
+    for _, group in groups:
+        group_index = group.index.to_numpy()
+        group_failure = failure.loc[group_index].to_numpy()
+        if time_col and time_col in group.columns and pd.api.types.is_datetime64_any_dtype(group[time_col]):
+            time_values = pd.to_datetime(group[time_col], errors="coerce")
+            for pos, current_time in enumerate(time_values):
+                if pd.isna(current_time):
+                    continue
+                horizon = current_time + pd.Timedelta(hours=horizon_hours)
+                future_mask = (time_values > current_time) & (time_values <= horizon)
+                out.loc[group_index[pos], label] = int(group_failure[future_mask.to_numpy()].any())
+        else:
+            for pos in range(len(group_failure)):
+                window_end = min(len(group_failure), pos + 1 + horizon_steps)
+                out.loc[group_index[pos], label] = int(group_failure[pos + 1 : window_end].any())
+
+    return out, label
+
+
 def clean_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     cleaned = df.copy()
     for col in cleaned.columns:

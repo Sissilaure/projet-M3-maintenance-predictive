@@ -28,6 +28,7 @@ def _load_artifact(filename: str):
 def predict_failure(equipment_id: str, values: dict) -> FailurePrediction:
     artifact = _load_artifact(CLASSIFIER_FILE)
     frame = pd.DataFrame([values])
+    prediction_horizon = "24h"
     if artifact is None:
         probability = heuristic_failure_probability(values)
         factors = [{"feature": "heuristique_temperature_vibration_pression", "importance": probability}]
@@ -39,10 +40,12 @@ def predict_failure(equipment_id: str, values: dict) -> FailurePrediction:
             model_probability = float(pipeline.predict_proba(frame)[0, 1]) if hasattr(pipeline, "predict_proba") else float(pipeline.predict(frame)[0])
         probability = max(model_probability, heuristic_failure_probability(values))
         factors = top_feature_factors(pipeline, frame)
+        prediction_horizon = artifact.get("prediction_horizon", prediction_horizon)
     return FailurePrediction(
         equipment_id=equipment_id,
         failure_probability=probability,
         predicted_failure=probability >= 0.5,
+        prediction_horizon=prediction_horizon,
         risk_level=risk_level(probability),
         top_factors=factors,
     )

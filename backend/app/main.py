@@ -28,15 +28,17 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 # =====================
 # MIDDLEWARE
 # =====================
+# Parse allowed origins from settings (comma-separated for flexibility)
+allowed_origins = [
+    origin.strip() for origin in settings.allowed_origins.split(",")
+]
+# Add frontend_url if not already included
+if settings.frontend_url not in allowed_origins:
+    allowed_origins.insert(0, settings.frontend_url)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        settings.frontend_url,
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-    ],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

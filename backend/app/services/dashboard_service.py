@@ -110,3 +110,78 @@ def demo_stats(metrics: dict) -> dict:
         "health_score": 84,
         "metrics": metrics,
     }
+
+
+def timeseries_data(limit: int = 100) -> list[dict]:
+    """
+    Extrait les dernières N observations de séries temporelles réelles.
+    Agrégées par heure pour tenir dans le dashboard.
+    """
+    settings = get_settings()
+    processed = settings.data_processed_dir / "maintenance_features.csv"
+    
+    # Si le fichier processed existe, utiliser les vraies données
+    if processed.exists():
+        df = pd.read_csv(processed, low_memory=False)
+    else:
+        # Sinon charger les brutes
+        bundle = load_raw_datasets(settings.data_raw_dir)
+        df = bundle.frame
+    
+    if df.empty:
+        return demo_timeseries()
+    
+    # Identifier les colonnes temps, capteurs
+    time_col = next((c for c in df.columns if "timestamp" in c.lower() or "time" in c.lower() or "datetime" in c.lower()), None)
+    temp_col = next((c for c in df.columns if "temp" in c.lower() and "air" not in c.lower() and "process" not in c.lower()), None)
+    vibr_col = next((c for c in df.columns if "vib" in c.lower()), None)
+    pres_col = next((c for c in df.columns if "pressure" in c.lower()), None)
+    rul_col = next((c for c in df.columns if "rul" in c.lower()), None)
+    prob_col = next((c for c in df.columns if "probability" in c.lower() or "failure_prob" in c.lower()), None)
+    
+    # Faire un pivot/aggrégation temporelle
+    df_subset = df.copy()
+    if time_col:
+        df_subset[time_col] = pd.to_datetime(df_subset[time_col], errors="coerce")
+        df_subset = df_subset.sort_values(time_col)
+    
+    # Garder les dernières N lignes
+    df_subset = df_subset.tail(limit)
+    
+    # Construire les séries
+    result = []
+    for idx, row in df_subset.iterrows():
+        entry = {}
+        
+        # Index de temps
+        if time_col:
+            t_val = row[time_col]
+            if pd.notna(t_val):
+                entry["t"] = str(t_val)[:16]  # format court YYYY-MM-DD HH:MM
+            else:
+                entry["t"] = f"T{idx}"
+        else:
+            entry["t"] = f"T{idx}"
+        
+        # Capteurs
+        entry["temp"] = float(row[temp_col]) if temp_col and pd.notna(row[temp_col]) else 70.0
+        entry["vibration"] = float(row[vibr_col]) if vibr_col and pd.notna(row[vibr_col]) else 40.0
+        entry["pressure"] = float(row[pres_col]) if pres_col and pd.notna(row[pres_col]) else 100.0
+        entry["rul"] = float(row[rul_col]) if rul_col and pd.notna(row[rul_col]) else 50.0
+        entry["probability"] = float(row[prob_col]) if prob_col and pd.notna(row[prob_col]) else 0.1
+        
+        result.append(entry)
+    
+    return result if result else demo_timeseries()
+
+
+def demo_timeseries() -> list[dict]:
+    """Données de démonstration pour séries temporelles."""
+    return [
+        {"t": "08:00", "temp": 61, "vibration": 29, "pressure": 88, "rul": 86, "probability": 0.11},
+        {"t": "10:00", "temp": 66, "vibration": 33, "pressure": 91, "rul": 78, "probability": 0.16},
+        {"t": "12:00", "temp": 72, "vibration": 39, "pressure": 98, "rul": 64, "probability": 0.24},
+        {"t": "14:00", "temp": 81, "vibration": 51, "pressure": 111, "rul": 39, "probability": 0.47},
+        {"t": "16:00", "temp": 89, "vibration": 64, "pressure": 127, "rul": 16, "probability": 0.78},
+        {"t": "18:00", "temp": 76, "vibration": 46, "pressure": 103, "rul": 44, "probability": 0.35},
+    ]

@@ -1,4 +1,4 @@
-import { Activity, AlertTriangle, BarChart3, BrainCircuit, Gauge, History, MonitorCog, Settings, Wrench } from "lucide-react";
+import { Activity, AlertTriangle, BarChart3, BrainCircuit, Gauge, History, MonitorCog, Wrench } from "lucide-react";
 
 const nav = [
   ["dashboard", Gauge, "Dashboard"],
@@ -8,7 +8,7 @@ const nav = [
   ["analytics", BarChart3, "Analytics"],
   ["explainability", BrainCircuit, "IA explicable"],
   ["historique", History, "Historique"],
-  ["settings", Settings, "Paramètres"]
+  
 ];
 
 export function Layout({ page, setPage, children }) {

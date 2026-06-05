@@ -112,6 +112,8 @@ Régression RUL :
 
 La validation utilise `TimeSeriesSplit` afin que l'entraînement apprenne sur le passé et que le test évalue le futur. Cette approche limite les fuites de données, point critique en maintenance prédictive.
 
+Le modèle de classification est entraîné sur une cible horizonée : il prédit la probabilité de panne dans la fenêtre temporelle suivante (par défaut 24h ou 3 pas de temps selon les données). Le RUL reste expérimentale et les scores doivent être interprétés comme une estimation assistée plutôt qu'une production finale.
+
 ## Dashboard
 
 Le frontend contient :
