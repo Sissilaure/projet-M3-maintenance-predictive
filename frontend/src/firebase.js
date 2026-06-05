@@ -11,11 +11,23 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+const isFirebaseConfigured = Boolean(
+  firebaseConfig.apiKey &&
+  firebaseConfig.databaseURL &&
+  firebaseConfig.projectId &&
+  firebaseConfig.appId
+);
+
+const app = isFirebaseConfigured ? initializeApp(firebaseConfig) : null;
+const db = app ? getDatabase(app) : null;
 
 // Subscribe to a realtime database path. Returns an unsubscribe function.
 export function subscribeSensorStream(path, callback) {
+  if (!db) {
+    console.warn("Firebase is not configured. Realtime sensor stream disabled.");
+    return () => {};
+  }
+
   const databaseRef = ref(db, path);
   const unsubscribe = onValue(databaseRef, (snapshot) => {
     callback(snapshot.val());
